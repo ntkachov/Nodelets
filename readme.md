@@ -19,8 +19,10 @@ Every node page should export a function called run. This function will be calle
 
 
 Params:
+
 	data [string]:
 		this is the raw string of data that was passed into your function.
+
 	res [function (string)]:
 		This is the responce function. 
 		When your page is done processing data, call this function and pass in a string. This string will be sent back to the client.
