@@ -73,7 +73,7 @@ function walkDirTree(path){
 			}
 			else{
 				if(file.indexOf(".js") == file.length - 3){
-					results.push(pathfile);
+					results.push(pathfile.slice(pathfile.length - 3);
 				}
 			}
 		}
