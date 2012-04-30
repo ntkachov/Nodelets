@@ -1,7 +1,7 @@
 #Node Pages Server
 This small file will set up a quick server that will server pages in the ./np/ directory. 
 
-###Usage: 
+##Usage: 
 Copy Server.js into a directory of your site. then run
 
 	node Server.js
@@ -12,7 +12,7 @@ It will probably complain about not finding a folder called "np"
 
 will create the folder where you should put all your node pages. 
 
-###Node page structure.
+##Node page structure.
 Every node page should export a function called run. This function will be called when your page is requested. This line MUST be included into your page or the server will not be able to call your page:
 	
 	exports.run = function(data, res)
@@ -28,7 +28,7 @@ Params:
 		When your page is done processing data, call this function and pass in a string. This string will be sent back to the client.
 
 
-###Configs:
+##Configs:
 Configuring node pages is done inside the Server.js file.
 
 ####included_Module_Extentions:
@@ -80,7 +80,7 @@ If true, the system will log any errors to the console.
 if true, the system will log any errors to a file.
 
 
-Sample node pages:
+##Sample node pages:
 
 helloworld.js
 	
