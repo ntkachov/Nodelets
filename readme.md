@@ -48,35 +48,35 @@ if it is set to false you will NOT be able to access it at the above url and ins
 
 This is useful if you do not want to confuse the browser with '.js' extentions.
 
-####node_pages_directory
+####node_pages_directory:
 What ever this is set to will be the directory that nodepages scans to load all of the modules in. 
 By default this is set to './np'.
 
 If Server.js is in this directory be sure to add Server.js to ignore_files.
 
-####ignore_files
+####ignore_files:
 this should be a comma seperated list of files for node pages to ignore. 
 note: If there is a directory in this list of files that directory will NOT be parsed neither will any of the subdirectories in that directory.
 
-####server_port
+####server_port:
 simply the port you wish for the server to run on. default is 9000 because Thats where I like to run my node servers.
 
-####log_file_path
+####log_file_path:
 The path that the access log will be writen to. Access log is a tab seperated log of the time, requested page, user-agent string, and user IP.
 
-####log_to_stdin
+####log_to_stdin:
 If true, the system will log any access requests to the console.
 
-####log_to_file
+####log_to_file:
 if true, the system will log any access requests to a file.
 
-####error_log_file_path
+####error_log_file_path:
 The path that the error log will be writen to. Error log consists of the Error message + new line + Stack trace.
 
-####error_log_to_stdin
+####error_log_to_stdin:
 If true, the system will log any errors to the console.
 
-####error_log_to_file
+####error_log_to_file:
 if true, the system will log any errors to a file.
 
 
