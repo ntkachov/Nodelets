@@ -166,15 +166,17 @@ function walkDirTree(path){
 var watchFile = function(path){
 	var thispath = path;
  	return function (event, filename){
+		console.log(event + " " + filename);
 		if(filename[0] == '.'){ return; }
-		if(event == 'change'){
-			for(var ext in include_Module_Extentions){
-				ext = include_Module_Extentions[ext];
-				if(filename.indexOf(ext) == filename.length - ext.length){
-					var filepath = path + "/" + filename;
-					console.log(event + " " + filepath);
-					scanFile(filepath, path);
+		for(var ext in include_Module_Extentions){
+			ext = include_Module_Extentions[ext];
+			if(filename.indexOf(ext) == filename.length - ext.length){
+				var filepath = path + "/" + filename;
+				if( !include_Module_Extentions_In_URL){
+					filepath = filepath.slice(0,-ext.length);
 				}
+				console.log(event + " " + filepath);
+				scanFile(filepath, path);
 			}
 		}
 	}
@@ -183,7 +185,10 @@ var watchFile = function(path){
 function scanFile(f, path){
 	route = f.slice(path.length + 1);
 	try{
+		var name = require.resolve(f);
+		delete require.cache[name];
 		router[route] = require(f);
+		console.log(router[route].run.toString());
 		console.log("	" + route + "	accessed at " + f);
 	}
 	catch(err){ 
