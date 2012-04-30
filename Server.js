@@ -37,8 +37,8 @@ function connectionManager(req, res) {
                 chunk = chunk.replace(/\+/g, ' ');
                 data += chunk;
         });
-        req.on('end', function(){ 
-                if(data === "" && req.url.indexOf("?") > -1){ //If there was no post data check for Get data
+req.on('end', function(){ 
+	if(data === "" && req.url.indexOf("?") > -1){ //If there was no post data check for Get data
                         var d = req.url.slice(req.url.indexOf("?") + 1, req.url.length);
                         if(d != undefined){
                                 data = decodeURI(d);
@@ -58,7 +58,7 @@ function connectionManager(req, res) {
 					});
                         }
                         catch(err){ //In the even that something goes haywire, this catch will cause the server to continue running.
-				LOGERROR(err + "\n" + err.stack);
+				LOGERROR(err);
                         }
                 }
                 else{
@@ -108,8 +108,8 @@ var LOGERROR = (function(){
 		stream.end();
 	});
 		
-	return function(error){
-		var s = '[' + new Date().toUTCString() + ']		' + error + "\n";
+	return function(err){
+		var s = '[' + new Date().toUTCString() + ']		' + err + "\n" + err.stack + "\n";
 		if(error_log_to_stdin){
 			console.log(s);
 		}
@@ -154,6 +154,7 @@ function walkDirTree(path){
 							else{
 								results.push(pathfile.slice(0,- ext.length));
 							}
+							fs.watch(pathfile, watchFile(dir));
 						}
 					}
 				}
@@ -162,18 +163,44 @@ function walkDirTree(path){
 	}
 	return results;
 };
+var watchFile = function(path){
+	var thispath = path;
+ 	return function (event, filename){
+		if(filename[0] == '.'){ return; }
+		if(event == 'change'){
+			for(var ext in include_Module_Extentions){
+				ext = include_Module_Extentions[ext];
+				if(filename.indexOf(ext) == filename.length - ext.length){
+					var filepath = path + "/" + filename;
+					console.log(event + " " + filepath);
+					scanFile(filepath, path);
+				}
+			}
+		}
+	}
+};
+
+function scanFile(f, path){
+	route = f.slice(path.length + 1);
+	try{
+		router[route] = require(f);
+		console.log("	" + route + "	accessed at " + f);
+	}
+	catch(err){ 
+		console.log("Could not include " + f)
+		LOGERROR(err);
+	 };
+}
 
 function createRouter(path){
-	
+	fs.watch(path, watchFile(path));	
 	var files = walkDirTree(path);
 	console.log("Loaded " + files.length + " Modules." );
 	
 	console.log("Routing with the following routes: ")
 	for(var f in files){
 		f = files[f];
-		route = f.slice(path.length + 1);
-		router[route] = require(f);
-		console.log("	" + route + "	accessed at " + f);
+		scanFile(f, path);
 	}
 };
 
