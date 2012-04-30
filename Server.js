@@ -4,11 +4,10 @@ var fs = require('fs');
 //Ill evntually put these in a sperate file but for now just edit the actual server page for the configs.
 //CONFIGS: 
 
-var included_Module_Extentions = [ '.js' ]; //Any files with this extention will be loaded as paged
+var include_Module_Extentions = [ '.js' ]; //Any files with this extention will be loaded as paged
 
 var include_Module_Extentions_In_URL = false;   //If this is set to true then the url will care about the extention of the module. 
-						//if true: www.example.com/np/mypage.js != www.example.com/np/mypage
-						//if false: www.example.com/np/mypage.js == www.eample.com/np/mypage
+						//See readme for full explaination.
 
 var node_pages_directory = './np';		//This is the path that the scanner will scan for all of the modules to include. 
 
@@ -146,8 +145,8 @@ function walkDirTree(path){
 					walkStack.push(pathfile);
 				}
 				else{
-					for(var ext in included_Module_Extentions){
-						ext = included_Module_Extentions[ext];
+					for(var ext in include_Module_Extentions){
+						ext = include_Module_Extentions[ext];
 						if(file.indexOf(ext) == file.length - ext.length){
 							if( include_Module_Extentions_In_URL){
 								results.push(pathfile);
