@@ -1,3 +1,4 @@
+![Nodelets Logo](icon.png)
 #Nodelets Server
 This small file will set up a quick server that will all node modules in a directory. Modules used with this server are called Nodelets.
 The server will automatically add any modules and track changes, automatically reloading and adding new nodelets as they are created or edited. The server does not have to be restarted and no hook code needs to be added. 
