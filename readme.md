@@ -23,8 +23,9 @@ Every nodelet should export a function called run. This function will be called 
 
 Params:
 
-	data [string]:
-		this is the raw string of data that was passed into your function.
+	data [Object]:
+		data.get: This is the raw get request that was included with the URL.
+		data.post: This is the raw post data that was included with the request. 
 
 	res [function (string)]:
 		This is the response function. 
