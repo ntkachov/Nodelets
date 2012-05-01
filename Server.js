@@ -1,36 +1,66 @@
 var http = require('http');
 var fs = require('fs');
 
-//Ill evntually put these in a sperate file but for now just edit the actual server file for the configs.
+//Ill evntually put these in a sperate file but for now just edit the actual server file for the config.
 //TODO: Set seprate file for Config.
 //TODO: Set watcher on config file and reload on change.
 //CONFIGS: 
+var config = {
 
-var include_Module_Extentions = [ '.js' ];	 //Any files with this extention will be loaded as nodelets
+	file_name: "nodelets.config",			//This is the only hard coded config. The name of the config file
+	
+	include_Module_Extentions : [ '.js' ],		//Any files with this extention will be loaded as config.nodelets
 
-var include_Module_Extentions_In_URL = true;   //If this is set to true then the url will care about the extention of the nodelet 
-						//See readme for full explaination.
+	include_Module_Extentions_In_URL : true,	//If this is set to true then the url will care about the extention of the nodelet 
+							//See readme for full explaination.
 
-var nodelets_directory = './np';		//This is the path that the scanner will scan for all of the nodelets to include. 
+	nodelets_directory : './np',			//This is the path that the scanner will scan for all of the nodelets to include. 
 
-var ignore_files = [ ];				//Ignore any files with any of these names.
+	ignore_files : [ ],				//Ignore any files with any of these names.
 
-var server_port = 9000; 			//The port we are running on.
+	server_port : 9000, 				//The port we are running on.
 
-var log_file_path = "nodePages.log";		//location of the logfile that node will log to
+	log_file_path : "nodePages.log",		//location of the logfile that node will log to
 
-var log_to_stdin = true;			//True if you want the output to also be loged to STDIN (terminal)
+	log_to_stdin : true,				//True if you want the output to also be loged to STDIN (terminal)
 
-var log_to_file = true;				//True if you want the output to also be loged to the log file.
+	log_to_file : true,				//True if you want the output to also be loged to the log file.
 						
-var error_log_file_path = "nodeErrors.log";		//location of the error logfile that node will log to
+	error_log_file_path : "nodeErrors.log",		//location of the error logfile that node will log to
 
-var error_log_to_stdin = true;			//True if you want any errors to also be loged to STDIN (terminal)
+	error_log_to_stdin : true,			//True if you want any errors to also be loged to STDIN (terminal)
 
-var error_log_to_file = true;				//True if you want any errors to also be loged to the log file.
+	error_log_to_file : true,			//True if you want any errors to also be loged to the log file.
+};
 
-var ndir = nodelets_directory.replace(/(.[^\/]*\/)(?=\w)/,'');
-console.log(ndir);
+var ndir = config.nodelets_directory.replace(/(.[^\/]*\/)(?=\w)/,'');
+
+function loadConfigData(){
+	if(require('path').existsSync(config.file_name)){
+		try{
+			var c = fs.readFileSync(config.file_name);
+			c = JSON.parse(c);			
+			config = c;
+			fs.watch(config.file_name, function(){
+				loadConfigData();
+			});
+		}
+		catch(err){
+			LOGERROR(err);
+			console.log("Couldn't read config file, reverting to defauts");
+		}
+	}
+	else{
+		//If there isnt a config file, make one.
+		fs.writeFileSync(config.file_name, JSON.stringify(config,undefined, 1));
+		fs.watch(config.file_name, function(){
+			loadConfigData();
+		});
+	}
+	console.log("Loaded Config data");
+}
+
+
 //Server
 function connectionManager(req, res) {
         var data = {post: "", get:""};
@@ -83,7 +113,7 @@ process.on('SIGINT', function(){
 
 //Used to log when we hit the server with a request
 var LOGACCESS = (function(){ 
-	var stream = fs.createWriteStream(log_file_path, {flags:'a', encoding:'utf8'});
+	var stream = fs.createWriteStream(config.log_file_path, {flags:'a', encoding:'utf8'});
 	stream.error = function(error){
 		console.log("Error occured writing to log file" + JSON.stringify(error));
 	};
@@ -98,10 +128,10 @@ var LOGACCESS = (function(){
 	return function(){
 		var s = Array.prototype.slice.call(arguments).join('	');
 		var s = '[' + new Date().toUTCString() + ']		' + s + "\n";
-		if(log_to_stdin){
+		if(config.log_to_stdin){
 			console.log(s);
 		}
-		if(stream.writable && log_to_file){
+		if(stream.writable && config.log_to_file){
 			stream.write(s);
 		}
 	};
@@ -109,7 +139,7 @@ var LOGACCESS = (function(){
 
 //If we throw an error log it for later debuging.
 var LOGERROR = (function(){
-	var stream = fs.createWriteStream(error_log_file_path, {flags:'a', encoding:'utf8'});
+	var stream = fs.createWriteStream(config.error_log_file_path, {flags:'a', encoding:'utf8'});
 	stream.error = function(error){
 		console.log("Error occured writing to log file" + JSON.stringify(error));
 	};
@@ -122,10 +152,10 @@ var LOGERROR = (function(){
 		
 	return function(err){
 		var s = '[' + new Date().toUTCString() + ']		' + err + "\n" + err.stack + "\n";
-		if(error_log_to_stdin){
+		if(config.error_log_to_stdin){
 			console.log(s);
 		}
-		if(stream.writable && error_log_to_file){
+		if(stream.writable && config.error_log_to_file){
 			stream.write(s);
 		}
 	};
@@ -146,7 +176,7 @@ function walkDirTree(path){
 		var dirs = fs.readdirSync(dir);
 		for(var file in dirs){
 			file = dirs[file];
-			if(!(file in ignore_files)){
+			if(!(file in config.ignore_files)){
 				var filepath = dir +'/' + file
 				var stat = fs.statSync(filepath);
 				if(stat.isDirectory()){
@@ -154,10 +184,10 @@ function walkDirTree(path){
 					fs.watch(filepath, watchFile(filepath));
 				}
 				else{
-					for(var ext in include_Module_Extentions){
-						ext = include_Module_Extentions[ext];
+					for(var ext in config.include_Module_Extentions){
+						ext = config.include_Module_Extentions[ext];
 						if(file.indexOf(ext) == file.length - ext.length){
-							if( include_Module_Extentions_In_URL){
+							if( config.include_Module_Extentions_In_URL){
 								results.push(filepath);
 							}
 							else{
@@ -178,16 +208,16 @@ var watchFile = function(path){
 		console.log(event + " " + filename);
 		var filepath = path + "/" + filename;
 		try{
-			if(filename[0] == '.' || filename in ignore_files){ return; }
+			if(filename[0] == '.' || filename in config.ignore_files){ return; }
 			var stat = fs.statSync(filepath);
 			if(stat.isDirectory()){
 				fs.watch(filepath, watchFile(filepath));
 				return;
 			}
-			for(var ext in include_Module_Extentions){
-				ext = include_Module_Extentions[ext];
+			for(var ext in config.include_Module_Extentions){
+				ext = config.include_Module_Extentions[ext];
 				if(filename.indexOf(ext) == filename.length - ext.length){
-					if( !include_Module_Extentions_In_URL){
+					if( !config.include_Module_Extentions_In_URL){
 						filepath = filepath.slice(0,-ext.length);
 					}
 					console.log(event + " " + filepath);
@@ -228,6 +258,7 @@ function createRouter(path){
 	
 };
 
-createRouter(nodelets_directory);
-http.createServer(connectionManager).listen(server_port);
-console.log("Now listening at localhost:" + server_port);
+loadConfigData();
+createRouter(config.nodelets_directory);
+http.createServer(connectionManager).listen(config.server_port);
+console.log("Now listening at localhost:" + config.server_port);
