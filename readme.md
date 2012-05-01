@@ -1,5 +1,7 @@
 #Node Pages Server
-This small file will set up a quick server that will server pages in the ./np/ directory. 
+This small file will set up a quick server that will server pages in a directory. 
+The server will automaticaly add any modules and track changes automatically reloading and adding new pages as they are created.
+This is ment to be a development server as it has not been tested in production. Although it should be able to handle a small website or prototype.
 
 ##Usage: 
 Copy Server.js into a directory of your site. then run
