@@ -143,3 +143,9 @@ slightlyLessTrivial.js
 Note:  Because nodelets handles Post and get requests the same this example can be accessed with
 'http://localhost:9000/np/testpage?[%22nick%22]'
 but is really designed to be used with post requests. For get request you should use a url parser or at least data.split("&"). 
+
+
+####Name guide:
+Nodelets - the name of the server
+nodelet  - a single module
+nodelets - many modules
