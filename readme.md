@@ -1,7 +1,7 @@
 ![Nodelets Logo](https://github.com/ntkachov/Nodelets/raw/master/icon.png)
 #Nodelets Server
-This small file will set up a quick server that will all node modules in a directory. Modules used with this server are called Nodelets.
-The server will automatically add any modules and track changes, automatically reloading and adding new nodelets as they are created or edited. The server does not have to be restarted and no hook code needs to be added. 
+Nodelets is a dead simple development server for node.js. Modules used with this server are called nodelets.
+The server will automatically load nodelets and track changes, automatically reloading and adding new nodelets as they are created or edited. The server does not have to be restarted and no hook code needs to be added. 
 This is meant to be a development server as it has not been tested in production. Although it should be able to handle a small website or prototype.
 
 ##Usage: 
@@ -15,7 +15,7 @@ To start the server just run:
 	node Server.js
 
 
-##Nodelet structure.
+##nodelet structure.
 Every nodelet should export a function called run. This function will be called when your page is requested. This line MUST be included into your page or the server will not be able to call your page:
 	
 	exports.run = function(data, res)
@@ -31,6 +31,16 @@ Params:
 		This is the response function. 
 		When your page is done processing data, call this function and pass in a string. This string will be sent back to the client.
 
+##Accessing a nodelet:
+Nodelets are accessed the same way you access a webpage.
+
+	localhost:9000/np/helloworld
+
+URL data can be included with a get request by appending a '?' and any data after. eg:
+
+	localhost:9000/np/helloworld?foo=bar
+
+Note: if 'include_Module_Extentions' is set to 'true' in the config file then the extention must be appended to the url such as 'localhost:9000/np/helloworld.js'. If your file does not contain an extention then Nodelets will allow it to be accessed extentionless.
 
 ##Config File:
 On first run, Server.js will create a nodelets.config file that will contain the configuration data for the server. Server.js also has it own internal defaults which it will default to should anything go wrong. Changing the internal data will NOT be reflected in the nodelets.config file until the config file is removed and recreated by Server.js. Changing the config file after it is created will cause node to reload the config file. This means any changes made to the config file will be reflected in the server instantly without having to reload the server.
@@ -39,7 +49,7 @@ Note: Any changes to the config file will not update the server post-humorously.
 
 ##Editing Config File:
 
-####included_Module_Extentions:
+####include_Module_Extentions:
 When the server scans for files to include as nodelets it looks for specific file extensions inside node_pages_directory.
 By default this is set to only look for '.js' files.
 
